@@ -50,7 +50,7 @@ function aglomerationElementsDOM(produits) {
 // Prepare les elements du DOM pour une carte article
 function constructionElementDOM(produit) {
     let element = "";
-    element += '<a href="./product.html?' + produit._id + '">\n';
+    element += '<a href="./product.html?id=' + produit._id + '">\n';
     element += '<article>\n';
     element += '<img src="' + produit.imageUrl + '" alt="' + produit.altTxt + ', ' + produit.name + '">\n';
     element += '<h3 class="productName">' + produit.name + '</h3>\n';
