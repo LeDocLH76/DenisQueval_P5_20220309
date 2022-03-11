@@ -1,9 +1,9 @@
 // Premier test d'extraction de données sur le serveur
 
-const pageProduct = "http://localhost:3000/api/products";
+const listeProduits = "http://localhost:3000/api/products";
 
 // Recupere l'ensemble des articles disponibles sur le serveur
-fetch(pageProduct)
+fetch(listeProduits)
     .then(function (res) {
         if (res.ok) {
             return res.json();
