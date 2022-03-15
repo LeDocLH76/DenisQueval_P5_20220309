@@ -1,12 +1,11 @@
 let pageCourante = window.location.href;
 let url = new URL(pageCourante);
-console.log("url = " + url);
+// console.log("url = " + url);
 let productId = url.searchParams.get("id");
-console.log("Numéro du produit = " + productId);
+// console.log("Numéro du produit = " + productId);
 const listeProduits = "http://localhost:3000/api/products";
 const urlUnProduit = listeProduits + "/" + productId;
-console.log("1 " + urlUnProduit);
-
+// console.log("1 " + urlUnProduit);
 
 // trouveUnProduit(urlUnProduit);
 // console.log("5 En retour de fetch mon produit = " + monProduit);
@@ -22,6 +21,7 @@ console.log("1 " + urlUnProduit);
 // }
 // console.log("5 Apres tout le bazard!");
 
+// Recuperation des informations sur un produit.
 fetch(urlUnProduit)
     .then(function (res) {
         if (res.ok) {
@@ -40,8 +40,8 @@ fetch(urlUnProduit)
 
 // Le reste dans une fonction pour ne pas etre bloqué
 // C'est a modifier plus tard des que le async await sera compris!
-
 function resteDuScript(value) {
+    //Definition de l'objet produit utilisé pour remplir le panier
     let produit = {
         nom: value.name,
         id: productId,
@@ -49,115 +49,130 @@ function resteDuScript(value) {
         quantite: 0
     };
 
+    //Ecoute le bouton ajouter
     let boutonAjouter = document.getElementById("addToCart");
     boutonAjouter.addEventListener("click", function ajoutePanier() {
-        console.log("Je suis dans l'ajout au panier.");
-        // console.log("L'id produit est: " + produit.id);
-        // console.log("Le nom du produit est: " + produit.nom);
+        console.log("Clic ajout au panier.");
+        //Lire et modifier la couleur du produit courant
         lireCouleur(produit, value);
+        //Lire et filtrer la quantité
         quantite = lireQuantite(produit);
-        if (produit.couleur == "" | quantite < 1) {
+        if (produit.couleur == "" | quantite == 0) {
             alert("Veuillez indiquer une couleur et une quantité.");
         } else {
-            console.log(produit);
             valideArticle(produit);
         }
+        //Efface la quantier sur le formulaire pour eviter une double entrée.
+        razQuantite();
     });
-    console.log("C'est la fin!....")
+    console.log("CTA");
 }
-// A finir doublon??? dans le ls
+
+//Compare le produit à ajouter avec ceux contenus dans le loalStorage
 function compareIdLocalStorage(produit) {
+    console.log("Fonction compare");
     let contenuLocalStorage = lireLocalStorage();
-    console.log("contenu du LS = " + contenuLocalStorage);
-    contenuLocalStorage.forEach(element => {
-        console.log("boucle compare")
+    let flagPresent = false, flagCouleur = false, position = 0;
+    //Parcours le contenu du localStorage
+    for (let index = 0; index < contenuLocalStorage.length; index++) {
+        const element = contenuLocalStorage[index];
+        //Si id déja present, leve le drapeau
         if (element.id == produit.id) {
-            console.log("Un id identique est déja dans le panier");
-            if (element.couleur == produit.couleur){
-                console.log("La couleur est identique");
-            }else{
-                console.log("else couleur");
-                ajouteLocalStorage(produit);
-            }
-        } else {
-            console.log("else id");
-            ajouteLocalStorage(produit);
+            flagPresent = true;
         }
-    });
-
+        //Si couleur identique, leve le drapeau et memorise la position dans le tableau
+        if (element.couleur == produit.couleur) {
+            flagCouleur = true;
+            position = index;
+        }
+    }
+    //Si le produit à ajouter est déja present de la meme couleur
+    if (flagPresent & flagCouleur) {
+        console.log("Mise a jour de la quantité");
+        //Mettre à jour la quantité
+        contenuLocalStorage[position].quantite += produit.quantite;
+    //Le produit à ajouter n'est pas present, ou pas de la meme couleur
+    } else {
+        //ajoute le produit au tableau
+        contenuLocalStorage.push(produit);
+    }
+    //Met à jour toujours
+    majLocalStorage(contenuLocalStorage);
 }
 
-function ajouteLocalStorage(produit) {
-    console.log("ajoute au LS");
-    // produit est un objet que l'on doit ajouter au tableau panier;
-    let panier = lireLocalStorage();
-    console.log("Produit dans ajoute LS = " + produit);
-    console.log("Panier dans ajoute LS = " + panier);
-    panier.push(produit);
+
+function majLocalStorage(panier) {
+    console.log("Fonction maj du LS");
     let panierJson = JSON.stringify(panier);
-    console.log("panierJson = " + panierJson);
     localStorage.setItem("panierKanap", panierJson);
-    alert("Produit ajouté!");
+    console.log("Panier mis à jour");
 }
 
 function lireLocalStorage() {
-    console.log("Le storage avant parse = " + localStorage.getItem("panierKanap"));
-    console.log("Le storage apres parse = " + JSON.parse(localStorage.getItem("panierKanap")));
-
+    console.log("Fonction lire LS");
     return JSON.parse(localStorage.getItem("panierKanap"));
 }
 
 function valideArticle(produit) {
-    console.log("Coucou je suis ajout au locaStorage");
+    console.log("Fonction valide article");
     let panier = lireLocalStorage();
-    console.log(panier);
+    //Si le panier est vide, création du premier enregistrement
     if (panier == null) {
         let panierJson = JSON.stringify([produit]);
-        console.log("panierJson = " + panierJson);
         localStorage.setItem("panierKanap", panierJson);
-        alert("Panier créé!");
-
+        console.log("Panier créé!");
+    //Si le panier contient quelque chose
     } else {
         console.log("Le panier contient déja qqc");
+        //On compare et on met à jour le panier suivant ce qu'il contient déja
         compareIdLocalStorage(produit);
     }
+    //Retour en attente d'action utilisateur
 }
 
+//Lire la couleur et l'affecter au produit
 function lireCouleur(produit, value) {
+    console.log("Fonction lire couleur");
     let cibleCouleur = document.querySelector("#colors");
-    // console.log("L'index de la couleur est: " + cibleCouleur.selectedIndex);
-    // console.log("La cible contient: " + value.colors[cibleCouleur.selectedIndex -1 ]);
+    //Pas de couleur selectionnée
     if (cibleCouleur.selectedIndex == 0) {
         console.log("Veuillez choisir une couleur!");
         produit.couleur = "";
+    //Affecte la couleur à l'index -1 dans le tableau de couleur recuperé sur le serveur à produit.couleur
     } else {
-        console.log("La couleur choisie est: " + value.colors[cibleCouleur.selectedIndex - 1]);
+        // console.log("La couleur choisie est: " + value.colors[cibleCouleur.selectedIndex - 1]);
         produit.couleur = value.colors[cibleCouleur.selectedIndex - 1];
     };
 }
 
-function lireQuantite(produit) {
+//Remet à 0 la quantité du formulaire
+function razQuantite() {
+    console.log("Fonction raz quantité");
     let cibleQuantite = document.querySelector("#quantity");
-    // console.log("Cible quantité = " + cibleQuantite);
-    // console.log("Valeur de cibleQuantite = " + cibleQuantite.value);
-    // console.log(typeof parseInt(cibleQuantite.value));
-    let quantite = parseInt(cibleQuantite.value);
-
-    if (quantite < 1 | quantite > 100) {
-        console.log("Veuillez choisir une quantité!");
-        produit.quantite = 0;
-        cibleQuantite.value = 0;
-    } else {
-        console.log("La quantité est: " + quantite);
-        produit.quantite = quantite;
-    };
-
-    return quantite;
-
+    cibleQuantite.value = 0;
 }
 
-function remplirLeDom(produit) {
+//Lit la quantité du formulaire
+function lireQuantite(produit) {
+    console.log("Fontion lire quantité");
+    let cibleQuantite = document.querySelector("#quantity");
+    //Transforme en nombre
+    let quantite = parseInt(cibleQuantite.value);
+    //Verifie la validité
+    if (quantite < 1 | quantite > 100 | quantite == NaN) {
+        quantite = 0;
+        produit.quantite = 0;
+        cibleQuantite.value = 0;
+    //Si valide l'affecte au produit
+    } else {
+        produit.quantite = quantite;
+    };
+    //Et la retourne
+    return quantite;
+}
 
+//Replir le Dom avec les infos retounées par le serveur
+function remplirLeDom(produit) {
     let insertion1 = document.getElementsByClassName("item__img");
     let elementCible = insertion1[0];
     elementCible.innerHTML = '<img src="' + produit.imageUrl + '" alt="' + produit.altTxt + '">\n';
