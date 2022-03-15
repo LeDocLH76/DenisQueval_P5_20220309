@@ -17,6 +17,7 @@ fetch(listeProduits)
 
 function resteDuScript(value) {
     let contenuPanierDom = "";
+    let quantiteTotale = 0;
     let prixTotal = 0
     let panier = lireLocalStorage();
     //Tri du panier sur le nom
@@ -32,7 +33,9 @@ function resteDuScript(value) {
             //Si egaux construire un element du dom et aglomerer à l'existant
             if (article.name == element.nom) {
                 console.log("Match " + element.nom + " Prix " + article.price + " €");
+                quantiteTotale += element.quantite;
                 prixTotal += article.price * element.quantite;
+                console.log("Quantité totale = " + quantiteTotale);
                 console.log("Prix total = " + prixTotal + " €");
                 contenuPanierDom += constructionElementDOM(element, article);
             }
@@ -41,6 +44,9 @@ function resteDuScript(value) {
     }
     let cibleDom = document.getElementById("cart__items");
     cibleDom.innerHTML = contenuPanierDom;
+
+    cibleDom = document.getElementById("totalQuantity");
+    cibleDom.innerHTML = quantiteTotale;
 
     cibleDom = document.getElementById("totalPrice");
     cibleDom.innerHTML = prixTotal;
