@@ -19,6 +19,8 @@ function resteDuScript(value) {
     let contenuPanierDom = "";
     let prixTotal = 0
     let panier = lireLocalStorage();
+    //Tri du panier sur le nom
+    trierPanier(panier);
     let contenuMagasin = value;
     //Pour chaque element dans le panier
     for (let index = 0; index < panier.length; index++) {
@@ -42,6 +44,16 @@ function resteDuScript(value) {
 
     cibleDom = document.getElementById("totalPrice");
     cibleDom.innerHTML = prixTotal;
+}
+
+function trierPanier(panier) {
+    panier.sort(function compare(a, b) {
+        if (a.nom < b.nom)
+            return -1;
+        if (a.nom > b.nom)
+            return 1;
+        return 0;
+    });
 }
 
 function constructionElementDOM(element, article) {
