@@ -15,41 +15,121 @@ fetch(listeProduits)
     })
     ;
 
-function resteDuScript(value) {
+function resteDuScript(contenuMagasin) {
     let contenuPanierDom = "";
     let quantiteTotale = 0;
     let prixTotal = 0
     let panier = lireLocalStorage();
     //Tri du panier sur le nom
     trierPanier(panier);
-    let contenuMagasin = value;
+
     //Pour chaque element dans le panier
     for (let index = 0; index < panier.length; index++) {
         const element = panier[index];
         //Pour chaque article dans contenuMagasin
         for (let index = 0; index < contenuMagasin.length; index++) {
             const article = contenuMagasin[index];
-            // console.log("Magasin " + article.name);
             //Si egaux construire un element du dom et aglomerer à l'existant
             if (article.name == element.nom) {
-                console.log("Match " + element.nom + " Prix " + article.price + " €");
-                quantiteTotale += element.quantite;
-                prixTotal += article.price * element.quantite;
-                console.log("Quantité totale = " + quantiteTotale);
-                console.log("Prix total = " + prixTotal + " €");
+                // console.log("Match " + element.nom + " Prix " + article.price + " €");
+                quantiteTotale += parseInt(element.quantite);
+                prixTotal += article.price * parseInt(element.quantite);
+                // console.log("Quantité totale = " + quantiteTotale);
+                // console.log("Prix total = " + prixTotal + " €");
                 contenuPanierDom += constructionElementDOM(element, article);
             }
         }
-        // console.log("Panier " + element.nom);
     }
+    //Remplir le dom avec l'aglomerat d'elements créé
     let cibleDom = document.getElementById("cart__items");
     cibleDom.innerHTML = contenuPanierDom;
+    majQuantiteDom(quantiteTotale);
+    majPrixDom(prixTotal);
+  
+    // console.log("ID enfant = " + cibleDom.children[index].dataset.id + " couleur enfant = " + cibleDom.children[index].dataset.color);
+    // console.log(cibleDom.children[index]);
+    // console.log(typeof parseInt(cibleDom.children[index].querySelector(".itemQuantity").value) );
 
+    //Pour tout les articles dans la page
+    //Ajoute un ecouteur sur la quantite qui modifie le localStorage en fonction
+    for (let index = 0; index < panier.length; index++) {
+        cibleDom.children[index].querySelector(".itemQuantity").addEventListener("change", function () {
+            let cibleDom = document.getElementById("cart__items");
+            let id = cibleDom.children[index].dataset.id;
+            let couleur = cibleDom.children[index].dataset.color;
+            let quantite = cibleDom.children[index].querySelector(".itemQuantity").value;
+            //Met à jour la quantité totale sur la page
+            let quantitePanier = panier[index].quantite;
+            let differenceQuantite = quantitePanier - quantite;
+            quantiteTotale -= differenceQuantite;
+            majQuantiteDom(quantiteTotale);
+            //Met à jour le prix total sur la page
+            let prixArticle = trouvePrixArticle(contenuMagasin, id);
+            prixTotal -= differenceQuantite * prixArticle;
+            majPrixDom(prixTotal);
+            //Modifie la quantité dans le localStorage
+            modifierQuantité(panier, id, couleur, quantite);
+        });
+        //Ajoute un ecouteur sur la suppression qui modifie le localStorage en fonction et recharge la page
+        cibleDom.children[index].querySelector(".deleteItem").addEventListener("click", function () {
+            console.log("Clic supprimer");
+            let cibleDom = document.getElementById("cart__items");
+            let id = cibleDom.children[index].dataset.id;
+            let couleur = cibleDom.children[index].dataset.color;
+            retirerLocalStorage(panier, id, couleur);
+        });
+    }
+}
+
+
+
+//Definitions de fonctions***************************************
+
+function trouvePrixArticle(contenuMagasin, id) {
+    for (let index = 0; index < contenuMagasin.length; index++) {
+        const element = contenuMagasin[index];
+        if (element._id == id) {
+            console.log(typeof element.price);
+            return element.price
+        }
+    }
+}
+
+function majPrixDom(prixTotal) {
+    cibleDom = document.getElementById("totalPrice");
+    cibleDom.innerHTML = prixTotal;
+}
+
+function majQuantiteDom(quantiteTotale) {
     cibleDom = document.getElementById("totalQuantity");
     cibleDom.innerHTML = quantiteTotale;
 
-    cibleDom = document.getElementById("totalPrice");
-    cibleDom.innerHTML = prixTotal;
+}
+
+function retirerLocalStorage(panier, id, couleur) {
+    for (let index = 0; index < panier.length; index++) {
+        const element = panier[index];
+        if (element.id == id & element.couleur == couleur) {
+            panier.splice(index, 1);
+            majLocalStorage(panier);
+            location.reload();
+        }
+    }
+}
+
+function modifierQuantité(panier, id, couleur, quantite) {
+    panier.forEach(element => {
+        if (element.id == id & element.couleur == couleur) {
+            element.quantite = quantite;
+            majLocalStorage(panier);
+        }
+    });
+}
+
+function majLocalStorage(panier) {
+    let panierJson = JSON.stringify(panier);
+    localStorage.setItem("panierKanap", panierJson);
+    console.log("Panier mis à jour");
 }
 
 function trierPanier(panier) {
@@ -64,9 +144,9 @@ function trierPanier(panier) {
 
 function constructionElementDOM(element, article) {
     contenuUnElement = "";
-    contenuUnElement += '<article class="cart__item" data-id="{' + element.id + '}" data-color="{' + element.couleur + '}">\n';
+    contenuUnElement += '<article class="cart__item" data-id="' + element.id + '" data-color="' + element.couleur + '">\n';
     contenuUnElement += '<div class="cart__item__img">\n';
-    contenuUnElement += '<img src="' + article.imageUrl + '" alt="Photographie d\'un canapé">\n';
+    contenuUnElement += '<img src="' + article.imageUrl + '" alt="' + article.altTxt + '">\n';
     contenuUnElement += '</div>\n'
     contenuUnElement += '<div class="cart__item__content">\n';
     contenuUnElement += '<div class="cart__item__content__description">\n';
