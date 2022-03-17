@@ -81,7 +81,55 @@ function resteDuScript(contenuMagasin) {
         });
     }
 
+    let tableVerification = [
+        {label:"firstName",labelMessage:"firstNameErrorMsg",regExp:"Denis",message:"Message erreur prénom",valide:false},
+        {label:"lastName",labelMessage:"lastNameErrorMsg",regExp:"QUEVAL",message:"Message erreur nom",valide:false},
+        {label:"address",labelMessage:"addressErrorMsg",regExp:"128",message:"Message erreur adresse",valide:false},
+        {label:"city",labelMessage:"cityErrorMsg",regExp:"LH",message:"Message erreur ville",valide:false},
+        {label:"email",labelMessage:"emailErrorMsg",regExp:"moi@labas",message:"Message erreur email",valide:false}        
+    ];
+   
+    tableVerification.forEach(element => {
+        let cible = document.getElementById(element.label);
+        // console.log(cible);
+        let messageCible = document.getElementById(element.labelMessage)
+        // console.log(messageCible);
+        cible.addEventListener("change", function () {
+            if (cible.value == element.regExp){
+                console.log("Coucou, j'ai changé de prénom!");
+                element.valide = true;
+            }else{
+                console.log("entrée non autorisée!");
+                cible.value = "";
+                messageCible.innerHTML = element.message;
+                element.valide = false;
+                // console.log(element.message);
+            }
+
+        });
+        cible.addEventListener("click", function () {
+            messageCible.innerHTML = "";
+        });
+    });
+
+    document.getElementById("order").addEventListener("click", function(e){
+        e.preventDefault();
+        let flagCommander = true;
+        tableVerification.forEach(element => {
+            console.log(element.valide);
+            if (element.valide == false){
+                flagCommander = false;
+            }
+        });
+        if (flagCommander == true){
+            alert("Passer la commande");
+        }else{
+            alert("Le formulaire n'est pas bien rempli!");
+        }
+    })
+
     //Debut du traitement du formulaire**************************
+    
 
 }
 
