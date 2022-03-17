@@ -1,11 +1,8 @@
 let pageCourante = window.location.href;
 let url = new URL(pageCourante);
-// console.log("url = " + url);
 let productId = url.searchParams.get("id");
-// console.log("Numéro du produit = " + productId);
 const listeProduits = "http://localhost:3000/api/products";
 const urlUnProduit = listeProduits + "/" + productId;
-// console.log("1 " + urlUnProduit);
 
 // trouveUnProduit(urlUnProduit);
 // console.log("5 En retour de fetch mon produit = " + monProduit);
@@ -65,7 +62,7 @@ function resteDuScript(value) {
         //Efface la quantier sur le formulaire pour eviter une double entrée.
         razQuantite();
     });
-    console.log("CTA");
+    console.log("Attente CTA");
 }
 
 //Compare le produit à ajouter avec ceux contenus dans le loalStorage
@@ -173,9 +170,9 @@ function lireQuantite(produit) {
 
 //Replir le Dom avec les infos retounées par le serveur
 function remplirLeDom(produit) {
-    let insertion1 = document.getElementsByClassName("item__img");
-    let elementCible = insertion1[0];
-    elementCible.innerHTML = '<img src="' + produit.imageUrl + '" alt="' + produit.altTxt + '">\n';
+    
+    let elementCible = document.getElementsByClassName("item__img")[0];
+    elementCible.innerHTML = `<img src="${produit.imageUrl}" alt="${produit.altTxt}">\n`;
 
     elementCible = document.getElementById("title");
     elementCible.innerHTML = produit.name;
@@ -189,7 +186,7 @@ function remplirLeDom(produit) {
     elementCible = document.getElementById("colors");
     let contenuDom = '<option value="">--SVP, choisissez une couleur --</option>\n';
     produit.colors.forEach(element => {
-        contenuDom += '<option value="' + element + '">' + element + '</option>\n';
+        contenuDom += `<option value="${element}">${element}</option>\n`;
     });
     elementCible.innerHTML = contenuDom;
 }

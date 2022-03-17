@@ -8,6 +8,7 @@ fetch(listeProduits)
         }
     })
     .then(function (value) {
+        //Tout le reste se passe ici
         resteDuScript(value)
     })
     .catch(function (err) {
@@ -16,6 +17,7 @@ fetch(listeProduits)
     ;
 
 function resteDuScript(contenuMagasin) {
+    
     let contenuPanierDom = "";
     let quantiteTotale = 0;
     let prixTotal = 0
@@ -30,25 +32,20 @@ function resteDuScript(contenuMagasin) {
         for (let index = 0; index < contenuMagasin.length; index++) {
             const article = contenuMagasin[index];
             //Si egaux construire un element du dom et aglomerer à l'existant
+            //Incremente le prix total et le nombre d'articles
             if (article.name == element.nom) {
-                // console.log("Match " + element.nom + " Prix " + article.price + " €");
                 quantiteTotale += parseInt(element.quantite);
                 prixTotal += article.price * parseInt(element.quantite);
-                // console.log("Quantité totale = " + quantiteTotale);
-                // console.log("Prix total = " + prixTotal + " €");
                 contenuPanierDom += constructionElementDOM(element, article);
             }
         }
     }
-    //Remplir le dom avec l'aglomerat d'elements créé
+
+    //Remplir le dom avec l'aglomerat d'éléments créé
     let cibleDom = document.getElementById("cart__items");
     cibleDom.innerHTML = contenuPanierDom;
     majQuantiteDom(quantiteTotale);
     majPrixDom(prixTotal);
-  
-    // console.log("ID enfant = " + cibleDom.children[index].dataset.id + " couleur enfant = " + cibleDom.children[index].dataset.color);
-    // console.log(cibleDom.children[index]);
-    // console.log(typeof parseInt(cibleDom.children[index].querySelector(".itemQuantity").value) );
 
     //Pour tout les articles dans la page
     //Ajoute un ecouteur sur la quantite qui modifie le localStorage en fonction
@@ -57,28 +54,35 @@ function resteDuScript(contenuMagasin) {
             let cibleDom = document.getElementById("cart__items");
             let id = cibleDom.children[index].dataset.id;
             let couleur = cibleDom.children[index].dataset.color;
-            let quantite = cibleDom.children[index].querySelector(".itemQuantity").value;
-            //Met à jour la quantité totale sur la page
-            let quantitePanier = panier[index].quantite;
-            let differenceQuantite = quantitePanier - quantite;
-            quantiteTotale -= differenceQuantite;
-            majQuantiteDom(quantiteTotale);
-            //Met à jour le prix total sur la page
-            let prixArticle = trouvePrixArticle(contenuMagasin, id);
-            prixTotal -= differenceQuantite * prixArticle;
-            majPrixDom(prixTotal);
-            //Modifie la quantité dans le localStorage
-            modifierQuantité(panier, id, couleur, quantite);
+            let quantite = parseInt(cibleDom.children[index].querySelector(".itemQuantity").value);
+            cibleDom.children[index].querySelector(".itemQuantity").value = quantite;
+            if (quantite > 0 & quantite <= 100 ){
+                //Met à jour la quantité totale sur la page
+                let quantitePanier = panier[index].quantite;
+                let differenceQuantite = quantitePanier - quantite;
+                quantiteTotale -= differenceQuantite;
+                majQuantiteDom(quantiteTotale);
+                //Met à jour le prix total sur la page
+                let prixArticle = trouvePrixArticle(contenuMagasin, id);
+                prixTotal -= differenceQuantite * prixArticle;
+                majPrixDom(prixTotal);
+                //Modifie la quantité dans le localStorage
+                modifierQuantité(panier, id, couleur, quantite);
+            }else{
+                cibleDom.children[index].querySelector(".itemQuantity").value = panier[index].quantite;
+            }
         });
         //Ajoute un ecouteur sur la suppression qui modifie le localStorage en fonction et recharge la page
         cibleDom.children[index].querySelector(".deleteItem").addEventListener("click", function () {
-            console.log("Clic supprimer");
             let cibleDom = document.getElementById("cart__items");
             let id = cibleDom.children[index].dataset.id;
             let couleur = cibleDom.children[index].dataset.color;
             retirerLocalStorage(panier, id, couleur);
         });
     }
+
+    //Debut du traitement du formulaire**************************
+
 }
 
 
@@ -110,8 +114,13 @@ function retirerLocalStorage(panier, id, couleur) {
     for (let index = 0; index < panier.length; index++) {
         const element = panier[index];
         if (element.id == id & element.couleur == couleur) {
+            //Si present, efface cartAndFormContainer de l'adresse de la page
+            window.location.hash = "";
             panier.splice(index, 1);
             majLocalStorage(panier);
+            //Insere cartAndFormContainer dans l'adresse de la page
+            window.location.hash = "cartAndFormContainer"
+            //Force le rechargement de la page au niveau du haut du panier
             location.reload();
         }
     }
@@ -143,33 +152,33 @@ function trierPanier(panier) {
 }
 
 function constructionElementDOM(element, article) {
-    contenuUnElement = "";
-    contenuUnElement += '<article class="cart__item" data-id="' + element.id + '" data-color="' + element.couleur + '">\n';
-    contenuUnElement += '<div class="cart__item__img">\n';
-    contenuUnElement += '<img src="' + article.imageUrl + '" alt="' + article.altTxt + '">\n';
-    contenuUnElement += '</div>\n'
-    contenuUnElement += '<div class="cart__item__content">\n';
-    contenuUnElement += '<div class="cart__item__content__description">\n';
-    contenuUnElement += '<h2>' + element.nom + '</h2>\n';
-    contenuUnElement += '<p>' + element.couleur + '</p>\n';
-    contenuUnElement += '<p>' + article.price + ' €</p>\n';
-    contenuUnElement += '</div>\n';
-    contenuUnElement += '<div class="cart__item__content__settings">\n';
-    contenuUnElement += '<div class="cart__item__content__settings__quantity">\n';
-    contenuUnElement += '<p>Qté : </p>\n';
-    contenuUnElement += '<input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="' + element.quantite + '">\n';
-    contenuUnElement += '</div>\n';
-    contenuUnElement += '<div class="cart__item__content__settings__delete">\n';
-    contenuUnElement += '<p class="deleteItem">Supprimer</p>\n';
-    contenuUnElement += '</div>\n';
-    contenuUnElement += '</div>\n';
-    contenuUnElement += '</div>\n';
-    contenuUnElement += '</article>\n';
+    contenuUnElement = `
+    <article class="cart__item" data-id="${element.id}" data-color="${element.couleur}">\n
+    <div class="cart__item__img">\n
+    <img src="${article.imageUrl}" alt="${article.altTxt}">\n
+    </div>\n
+    <div class="cart__item__content">\n
+    <div class="cart__item__content__description">\n
+    <h2>${element.nom}</h2>\n
+    <p>${element.couleur}</p>\n
+    <p>${article.pric} €</p>\n
+    </div>\n
+    <div class="cart__item__content__settings">\n
+    <div class="cart__item__content__settings__quantity">\n
+    <p>Qté : </p>\n
+    <input type="number" class="itemQuantity" name="itemQuantity" min="1" max="100" value="${element.quantite}">\n
+    </div>\n
+    <div class="cart__item__content__settings__delete">\n
+    <p class="deleteItem">Supprimer</p>\n
+    </div>\n
+    </div>\n
+    </div>\n
+    </article>\n
+    `;
     return contenuUnElement
 }
 
 function lireLocalStorage() {
-    console.log("Fonction lire LS");
     return JSON.parse(localStorage.getItem("panierKanap"));
 }
 
@@ -203,3 +212,8 @@ function lireLocalStorage() {
 // const get = function("http://localhost:3000/api/products/055743915a544fde83cfdfc904935ee7"){
 
 // }
+
+  
+    // console.log("ID enfant = " + cibleDom.children[index].dataset.id + " couleur enfant = " + cibleDom.children[index].dataset.color);
+    // console.log(cibleDom.children[index]);
+    // console.log(typeof parseInt(cibleDom.children[index].querySelector(".itemQuantity").value) );

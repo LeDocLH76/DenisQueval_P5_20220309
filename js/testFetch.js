@@ -19,22 +19,6 @@ fetch(listeProduits)
     })
     ;
 
-// Pour test >> a supprimer
-function afficheLesProduits(produits) {
-    console.log("Longueur du tableau " + produits.length)
-    for (let index = 0; index < produits.length; index++) {
-        const element = produits[index];
-        console.log("index = " + index)
-        console.log(element.name);
-        console.log(element.description);
-        console.log(element.colors);
-        console.log(element.price);
-        console.log(element._id);
-        console.log(element.altTxt);
-        console.log(element.imageUrl);
-    }
-}
-
 // Parcours la liste des produits disponibles
 // et aglomere les differentes cartes article
 function aglomerationElementsDOM(produits) {
@@ -44,18 +28,19 @@ function aglomerationElementsDOM(produits) {
         // appel de la fonction de construction d'une carte
         blocElementsDom += constructionElementDOM(element);
     }
+    console.log(blocElementsDom)
     return blocElementsDom
 }
 
 // Prepare les elements du DOM pour une carte article
 function constructionElementDOM(produit) {
-    let element = "";
-    element += '<a href="./product.html?id=' + produit._id + '">\n';
-    element += '<article>\n';
-    element += '<img src="' + produit.imageUrl + '" alt="' + produit.altTxt + ', ' + produit.name + '">\n';
-    element += '<h3 class="productName">' + produit.name + '</h3>\n';
-    element += '<p class="productDescription">' + produit.description + '</p>\n';
-    element += '</article>\n';
-    element += '</a>\n';
+    let element = `
+    <a href="./product.html?id=${produit._id}">\n
+    <article>\n
+    <img src="${produit.imageUrl}" alt="${produit.altTxt}, ${produit.name}">\n
+    <h3 class="productName">${produit.name}</h3>\n
+    <p class="productDescription">${produit.description}</p>\n
+    </article>\n
+    </a>\n`;
     return element;
 }
