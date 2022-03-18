@@ -17,6 +17,10 @@ fetch(listeProduits)
     ;
 
 function resteDuScript(contenuMagasin) {
+    //Recharge la page si le localStorage à changé alors que cette page était déja ouverte dans un autre onglet.
+    window.addEventListener("storage", function(){
+        location.reload();
+    });
     
     let contenuPanierDom = "";
     let quantiteTotale = 0;
@@ -54,10 +58,12 @@ function resteDuScript(contenuMagasin) {
             let cibleDom = document.getElementById("cart__items");
             let id = cibleDom.children[index].dataset.id;
             let couleur = cibleDom.children[index].dataset.color;
-            let quantite = parseInt(cibleDom.children[index].querySelector(".itemQuantity").value);
+            let quantite = cibleDom.children[index].querySelector(".itemQuantity").value;
             cibleDom.children[index].querySelector(".itemQuantity").value = quantite;
-            if (quantite > 0 & quantite <= 100 ){
+            if (quantite > 0 & quantite <= 100 & quantite != null & quantite != NaN & quantite != ""){
                 //Met à jour la quantité totale sur la page
+                quantite = parseInt(quantite);
+                cibleDom.children[index].querySelector(".itemQuantity").value = quantite;
                 let quantitePanier = panier[index].quantite;
                 let differenceQuantite = quantitePanier - quantite;
                 quantiteTotale -= differenceQuantite;
@@ -81,6 +87,7 @@ function resteDuScript(contenuMagasin) {
         });
     }
 
+//Debut du traitement du formulaire**************************
     let tableVerification = [
         {label:"firstName",labelMessage:"firstNameErrorMsg",regExp:"Denis",message:"Message erreur prénom",valide:false},
         {label:"lastName",labelMessage:"lastNameErrorMsg",regExp:"QUEVAL",message:"Message erreur nom",valide:false},
@@ -112,6 +119,7 @@ function resteDuScript(contenuMagasin) {
         });
     });
 
+
     document.getElementById("order").addEventListener("click", function(e){
         e.preventDefault();
         let flagCommander = true;
@@ -128,7 +136,7 @@ function resteDuScript(contenuMagasin) {
         }
     })
 
-    //Debut du traitement du formulaire**************************
+    
     
 
 }
@@ -209,7 +217,7 @@ function constructionElementDOM(element, article) {
     <div class="cart__item__content__description">\n
     <h2>${element.nom}</h2>\n
     <p>${element.couleur}</p>\n
-    <p>${article.pric} €</p>\n
+    <p>${article.price} €</p>\n
     </div>\n
     <div class="cart__item__content__settings">\n
     <div class="cart__item__content__settings__quantity">\n

@@ -154,9 +154,10 @@ function lireQuantite(produit) {
     console.log("Fontion lire quantité");
     let cibleQuantite = document.querySelector("#quantity");
     //Transforme en nombre
-    let quantite = parseInt(cibleQuantite.value);
+    let quantite = cibleQuantite.value;
     //Verifie la validité
-    if (quantite < 1 | quantite > 100 | quantite == NaN) {
+    if (quantite == NaN | quantite == "" | quantite < 1 | quantite > 100){
+        console.log("Probleme de quantité = " + quantite);
         quantite = 0;
         produit.quantite = 0;
         cibleQuantite.value = 0;
