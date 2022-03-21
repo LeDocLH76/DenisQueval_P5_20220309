@@ -4,20 +4,6 @@ let productId = url.searchParams.get("id");
 const listeProduits = "http://localhost:3000/api/products";
 const urlUnProduit = listeProduits + "/" + productId;
 
-// trouveUnProduit(urlUnProduit);
-// console.log("5 En retour de fetch mon produit = " + monProduit);
-// remplirLeDom(monProduit);
-
-// async function trouveUnProduit(urlUnProduit) {
-//     console.log("2 Dans trouve un produit " + urlUnProduit);
-//     let resultat = await fetch(urlUnProduit);
-//     console.log("3 Apres fetch resultat = " + resultat);
-//     let monProduit = await resultat.json();
-//     console.log("4 Apres fetch mon produit = " + monProduit);
-//     remplirLeDom(monProduit);
-// }
-// console.log("5 Apres tout le bazard!");
-
 // Recuperation des informations sur un produit.
 fetch(urlUnProduit)
     .then(function (res) {
@@ -35,8 +21,7 @@ fetch(urlUnProduit)
     });
 
 
-// Le reste dans une fonction pour ne pas etre bloqué
-// C'est a modifier plus tard des que le async await sera compris!
+// Le reste dans une fonction.
 function resteDuScript(value) {
     //Definition de l'objet produit utilisé pour remplir le panier
     let produit = {
