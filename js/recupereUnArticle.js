@@ -148,9 +148,9 @@ function lireQuantite(produit) {
         cibleQuantite.value = 0;
     //Si valide l'affecte au produit
     } else {
-        produit.quantite = quantite;
+        produit.quantite = parseInt(quantite);
     };
-    //Et la retourne
+    //Et la retourne en number
     return quantite;
 }
 
