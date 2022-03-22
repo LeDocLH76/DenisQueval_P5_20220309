@@ -43,7 +43,13 @@ function resteDuScript(value) {
             alert("Veuillez indiquer une couleur et une quantité.");
         } else {
             valideArticle(produit);
-            alert("Le produit à été ajouté au panier");
+            console.log("Le produit à été ajouté au panier");
+            if(confirm("Voulez vous aller au panier ?")){
+                document.location.replace("cart.html");
+            }else{
+                console.log("Je reste ici !")
+            }
+
         }
         //Efface la quantier sur le formulaire pour eviter une double entrée.
         razQuantite();

@@ -18,10 +18,10 @@ fetch(listeProduits)
 
 function resteDuScript(contenuMagasin) {
     //Recharge la page si le localStorage à changé alors que cette page était déja ouverte dans un autre onglet.
-    window.addEventListener("storage", function(){
+    window.addEventListener("storage", function () {
         location.reload();
     });
-    
+
     let contenuPanierDom = "";
     let quantiteTotale = 0;
     let prixTotal = 0
@@ -30,6 +30,7 @@ function resteDuScript(contenuMagasin) {
     trierPanier(panier);
 
     //Pour chaque element dans le panier
+    // Construction du dom et cumul quantité et prix
     for (let index = 0; index < panier.length; index++) {
         const element = panier[index];
         //Pour chaque article dans contenuMagasin
@@ -48,11 +49,12 @@ function resteDuScript(contenuMagasin) {
     //Remplir le dom avec l'aglomerat d'éléments créé
     let cibleDom = document.getElementById("cart__items");
     cibleDom.innerHTML = contenuPanierDom;
+    // Affiche quantité et prix total
     majQuantiteDom(quantiteTotale);
     majPrixDom(prixTotal);
 
     //Pour tout les articles dans la page
-    //Ajoute un ecouteur sur la quantite qui modifie le localStorage en fonction
+    //Ajoute un ecouteur sur un changement de quantite qui modifie le panier et le localStorage en fonction
     for (let index = 0; index < panier.length; index++) {
         cibleDom.children[index].querySelector(".itemQuantity").addEventListener("change", function () {
             let cibleDom = document.getElementById("cart__items");
@@ -60,21 +62,26 @@ function resteDuScript(contenuMagasin) {
             let couleur = cibleDom.children[index].dataset.color;
             let quantite = cibleDom.children[index].querySelector(".itemQuantity").value;
             cibleDom.children[index].querySelector(".itemQuantity").value = quantite;
-            if (quantite > 0 & quantite <= 100 & quantite != null & quantite != NaN & quantite != ""){
-                //Met à jour la quantité totale sur la page
+
+            if (quantite > 0 & quantite <= 100 & quantite != null & quantite != NaN & quantite != "") {
                 quantite = parseInt(quantite);
+                //Met à jour la quantité totale sur la page                
                 cibleDom.children[index].querySelector(".itemQuantity").value = quantite;
+                // De combien la quantité à changé ?
                 let quantitePanier = panier[index].quantite;
                 let differenceQuantite = quantitePanier - quantite;
+                // Met à jour
                 quantiteTotale -= differenceQuantite;
                 majQuantiteDom(quantiteTotale);
-                //Met à jour le prix total sur la page
+                // Quel est le prix de l'article en cours de traitement
                 let prixArticle = trouvePrixArticle(contenuMagasin, id);
+                //Met à jour le prix total et le total sur la page
                 prixTotal -= differenceQuantite * prixArticle;
                 majPrixDom(prixTotal);
                 //Modifie la quantité dans le localStorage
                 modifierQuantité(panier, id, couleur, quantite);
-            }else{
+            } else {
+                // L'entrée n'est pas valide, reaffiche le contenu du panier
                 cibleDom.children[index].querySelector(".itemQuantity").value = panier[index].quantite;
             }
         });
@@ -87,44 +94,53 @@ function resteDuScript(contenuMagasin) {
         });
     }
 
-//Debut du traitement du formulaire**************************
-    let tableVerification = [
-        {label:"firstName",labelMessage:"firstNameErrorMsg",regExp:"^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$",message:"Alan => Majuscules minuscules accents espaces tirets 30c maximum",valide:false},
-        {label:"lastName",labelMessage:"lastNameErrorMsg",regExp:"^[A-Z][A-Z' -]{1,28}[A-Z]$",message:"TURING => Majuscules espaces tirets apostrophes 30c maximum",valide:false},
-        {label:"address",labelMessage:"addressErrorMsg",regExp:"^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\u005C-]{1,28}[\\wàâãäçèéêëîïñôöûü]$",message:"Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum",valide:false},
-        {label:"city",labelMessage:"cityErrorMsg",regExp:"^[A-Z][\\wàâãäçèéêëîïñôöûü' /-]{1,28}[\\wàâãäçèéêëîïñôöûü]$",message:"LONDRE => Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum",valide:false},
-        {label:"email",labelMessage:"emailErrorMsg",regExp:"^[\\w.+-]{1,64}@[\\w-]{2,252}\\.[a-zA-Z][a-zA-Z\\.]{1,5}$",message:"Veuillez entrer une adresse valide",valide:false}        
-    ];
-// ******************Mes regex***********************
-// ^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$
-// ^[A-Z][A-Z' -]{1,28}[A-Z]$
-// ^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\-]{1,28}[\\w]$
-// ^[A-Z][\\w' /-]{1,28}[\\w]$
+    // Debut du traitement du formulaire**************************
 
-// *******************Celles des autres*****************************
+    // Creation d'un tableau d'objets contenant les valeurs utiles pour chaques entrées input
+    let tableVerification = [
+        { label: "firstName", labelMessage: "firstNameErrorMsg", regExp: "^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$", message: "Alan => Majuscules minuscules accents espaces tirets 30c maximum", valide: false },
+        { label: "lastName", labelMessage: "lastNameErrorMsg", regExp: "^[A-Z][A-Z' -]{1,28}[A-Z]$", message: "TURING => Majuscules espaces tirets apostrophes 30c maximum", valide: false },
+        { label: "address", labelMessage: "addressErrorMsg", regExp: "^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\u005C-]{1,28}[\\wàâãäçèéêëîïñôöûü]$", message: "Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum", valide: false },
+        { label: "city", labelMessage: "cityErrorMsg", regExp: "^[A-Z][\\wàâãäçèéêëîïñôöûü' /-]{1,28}[\\wàâãäçèéêëîïñôöûü]$", message: "LONDRE => Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum", valide: false },
+        { label: "email", labelMessage: "emailErrorMsg", regExp: "^[\\w.+-]{1,64}@[\\w-]{2,252}\\.[a-zA-Z][a-zA-Z\\.]{1,5}$", message: "Veuillez entrer une adresse valide", valide: false }
+    ];
+    // ******************Mes regex***********************
+    // ^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$
+    // ^[A-Z][A-Z' -]{1,28}[A-Z]$
+    // ^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\-]{1,28}[\\w]$
+    // ^[A-Z][\\w' /-]{1,28}[\\w]$
+
+    // *******************Celles des autres*****************************
     // ^[a-z]+([ \-']?[a-z]+[ \-']?[a-z]+[ \-']?)[a-z]+$"
     // /(^[A-Za-z\u00C0-\u024F-]+? *[A-Za-z\u00C0-\u024F]) ([A-Za-z\u00C0-\u024F-\s]+?$)
     // ^[^@\s]+@[^@\s]+\.[^@\s]+$
     // ^[\w.+-]{1,64}@([a-zA-Z\d-]{2,252}\.[a-zA-Z\.]{2,6}){5,255}$
     // ^((?:(?:[a-zA-Z0-9_\-\.]+)@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(?:(?:[a-zA-Z0-9\-]+\.)+))(?:[a-zA-Z]{2,4}|[0-9]{1,3})(?:\]?)(?:\s*;\s*|\s*$))*)$
-   
+
+    // Verification de la conformité des entrées input
+    // Pour chaque objet de la table de verification
     tableVerification.forEach(element => {
         let cible = document.getElementById(element.label);
-        // console.log(cible);
-        let messageCible = document.getElementById(element.labelMessage)
-        // console.log(messageCible);
+        let messageCible = document.getElementById(element.labelMessage);
+        // Place un ecouteur sur changement
         cible.addEventListener("change", function () {
+            // Nouvel objet RegExp suivant la valeur dans la table de verification
             const regExVal = new RegExp(element.regExp);
             console.log(regExVal);
-            if (cible.value.match(regExVal)){
-                console.log(`Coucou, j'ai changé de ${element.label} !`);
+            // Input valide ?
+            if (cible.value.match(regExVal)) {
+                console.log();
+                // Bascule le drapeau dans la table de verification à vrai
                 element.valide = true;
-            }else{
+            } else {
                 console.log("Entrée non autorisée!");
+                // Efface l'entrée erronée 
                 cible.value = "";
+                // Informe l'utilisateur
                 messageCible.innerHTML = element.message;
+                // Bascule le drapeau dans la table de verification à faux
                 element.valide = false;
-                // console.log(element.message);
+                console.log(`Erreur de ${element.label} !`);
             }
 
         });
@@ -133,25 +149,36 @@ function resteDuScript(contenuMagasin) {
         });
     });
 
-
-    document.getElementById("order").addEventListener("click", function(e){
+    // Ecoute le bouton commander et reagi au click
+    document.getElementById("order").addEventListener("click", function (e) {
         e.preventDefault();
-        let flagCommander = true;
-        tableVerification.forEach(element => {
-            console.log(element.valide);
-            if (element.valide == false){
-                flagCommander = false;
+        // Verifie que le panier n'est pas vide
+        if (panier.length != 0) {
+            // Indique bon pour commande
+            let flagCommander = true;
+            // Pour chaque input du formulaire
+            tableVerification.forEach(element => {
+                console.log(`Imput du formulaire bien rempli ? ${element.valide}`);
+                // Verifie si valide
+                if (element.valide == false) {
+                    // Si invalide, indicateur bon pour commande = false
+                    flagCommander = false;
+                }
+            });
+            // Si tout les input sont valides
+            if (flagCommander == true) {
+                alert("Passer la commande");
+            } else {
+                // Un au moins des input est invalide
+                alert("Le formulaire n'est pas bien rempli!");
             }
-        });
-        if (flagCommander == true){
-            alert("Passer la commande");
-        }else{
-            alert("Le formulaire n'est pas bien rempli!");
-        }
-    })
+            console.log(`Le panier contient ${panier.length} article`);
 
-    
-    
+        } else {
+            alert("Le panier est vide !")
+        }
+
+    })
 
 }
 
@@ -159,27 +186,30 @@ function resteDuScript(contenuMagasin) {
 
 //Definitions de fonctions***************************************
 
+//Parcours le tableau des articles du serveur et retourne le prix correspondant à l'id passé en parametre
 function trouvePrixArticle(contenuMagasin, id) {
     for (let index = 0; index < contenuMagasin.length; index++) {
         const element = contenuMagasin[index];
         if (element._id == id) {
-            console.log(typeof element.price);
             return element.price
         }
     }
 }
 
+// Met à jour le prix sur la page
 function majPrixDom(prixTotal) {
     cibleDom = document.getElementById("totalPrice");
     cibleDom.innerHTML = prixTotal;
 }
 
+// Met à jour la quantité sur la page
 function majQuantiteDom(quantiteTotale) {
     cibleDom = document.getElementById("totalQuantity");
     cibleDom.innerHTML = quantiteTotale;
 
 }
 
+// Retire un article du panier et du localStorage puis recharge la page
 function retirerLocalStorage(panier, id, couleur) {
     for (let index = 0; index < panier.length; index++) {
         const element = panier[index];
@@ -190,12 +220,13 @@ function retirerLocalStorage(panier, id, couleur) {
             majLocalStorage(panier);
             //Insere cartAndFormContainer dans l'adresse de la page
             window.location.hash = "cartAndFormContainer"
-            //Force le rechargement de la page au niveau du haut du panier
+            //Force le rechargement de la page au niveau du haut du panier id=cartAndFormContainer
             location.reload();
         }
     }
 }
 
+// Modifie la quantité d'un article dans le panier et le localStorage
 function modifierQuantité(panier, id, couleur, quantite) {
     panier.forEach(element => {
         if (element.id == id & element.couleur == couleur) {
@@ -205,12 +236,15 @@ function modifierQuantité(panier, id, couleur, quantite) {
     });
 }
 
+// Met à jour le localStorage avec le contenu du panier
 function majLocalStorage(panier) {
     let panierJson = JSON.stringify(panier);
     localStorage.setItem("panierKanap", panierJson);
     console.log("Panier mis à jour");
 }
 
+// Trie le panier par ordre alphabetique
+// Permet de regrouper les articles de meme id et de couleurs differentes
 function trierPanier(panier) {
     panier.sort(function compare(a, b) {
         if (a.nom < b.nom)
@@ -221,6 +255,7 @@ function trierPanier(panier) {
     });
 }
 
+// Construit un élément du Dom
 function constructionElementDOM(element, article) {
     contenuUnElement = `
     <article class="cart__item" data-id="${element.id}" data-color="${element.couleur}">\n
@@ -248,42 +283,7 @@ function constructionElementDOM(element, article) {
     return contenuUnElement
 }
 
+// Lecture du localStorage
 function lireLocalStorage() {
     return JSON.parse(localStorage.getItem("panierKanap"));
 }
-
-
-
-
-
-// const getUnProduit = async function (url) {
-//     try {
-//         const response = await fetch(url);
-//         if (response.ok) {
-//             const data = await response.json();
-//             console.log("1");
-//             console.log(data);
-//         } else {
-//             console.error("Retour du serveur : ", response.status);
-//         }
-
-//     } catch (error) {
-//         console.log(error);
-//     }
-// }
-
-// getUnProduit("http://localhost:3000/api/products/055743915a544fde83cfdfc904935ee7").then(function(response){
-//     console.log("2");
-//     console.log(response);
-// });
-// console.log("3")
-
-
-// const get = function("http://localhost:3000/api/products/055743915a544fde83cfdfc904935ee7"){
-
-// }
-
-  
-    // console.log("ID enfant = " + cibleDom.children[index].dataset.id + " couleur enfant = " + cibleDom.children[index].dataset.color);
-    // console.log(cibleDom.children[index]);
-    // console.log(typeof parseInt(cibleDom.children[index].querySelector(".itemQuantity").value) );
