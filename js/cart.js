@@ -96,6 +96,34 @@ function resteDuScript(contenuMagasin) {
 
     // Debut du traitement du formulaire**************************
 
+    // Creation d'un objet contact dans le localStorage
+    let contact = {
+        firstName: "",
+        lastName: "",
+        address: "",
+        city: "",
+        email: ""
+    }
+
+    let contactStorage = JSON.parse(localStorage.getItem("contact"));
+    if (contactStorage.firstName != "") {
+        contact.firstName = contactStorage.firstName
+    };
+    if (contactStorage.lastName != "") {
+        contact.lastName = contactStorage.firstName
+    };
+    if (contactStorage.address != "") {
+        contact.address = contactStorage.firstName
+    };
+    if (contactStorage.city != "") {
+        contact.city = contactStorage.firstName
+    };
+    if (contactStorage.email != "") {
+        contact.email = contactStorage.firstName
+    };
+    majContactStorage(contact);
+
+
     // Creation d'un tableau d'objets contenant les valeurs utiles pour chaques entrées input
     let tableVerification = [
         { label: "firstName", labelMessage: "firstNameErrorMsg", regExp: "^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$", message: "Alan => Majuscules minuscules accents espaces tirets 30c maximum", valide: false },
@@ -129,9 +157,12 @@ function resteDuScript(contenuMagasin) {
             console.log(regExVal);
             // Input valide ?
             if (cible.value.match(regExVal)) {
-                console.log();
+                console.log("Entrée valide");
                 // Bascule le drapeau dans la table de verification à vrai
                 element.valide = true;
+                
+                contact[element.label] = cible.value;
+                majContactStorage(contact);
             } else {
                 console.log("Entrée non autorisée!");
                 // Efface l'entrée erronée 
@@ -182,9 +213,13 @@ function resteDuScript(contenuMagasin) {
 
 }
 
-
-
 //Definitions de fonctions***************************************
+
+// Met à jour les infos de contact dans le localStorage
+function majContactStorage(contact) {
+    let contactJson = JSON.stringify(contact);
+    localStorage.setItem("contact", contactJson);
+}
 
 //Parcours le tableau des articles du serveur et retourne le prix correspondant à l'id passé en parametre
 function trouvePrixArticle(contenuMagasin, id) {
