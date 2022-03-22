@@ -24,7 +24,7 @@ fetch(urlUnProduit)
 // Le reste dans une fonction.
 function resteDuScript(value) {
     //Definition de l'objet produit utilisé pour remplir le panier
-    let produit = {
+    const produit = {
         nom: value.name,
         id: productId,
         couleur: "",
@@ -43,6 +43,7 @@ function resteDuScript(value) {
             alert("Veuillez indiquer une couleur et une quantité.");
         } else {
             valideArticle(produit);
+            alert("Le produit à été ajouté au panier");
         }
         //Efface la quantier sur le formulaire pour eviter une double entrée.
         razQuantite();
@@ -82,7 +83,7 @@ function compareIdLocalStorage(produit) {
     majLocalStorage(contenuLocalStorage);
 }
 
-
+//Remet à jour le localStore avec les infos contenues dans panier
 function majLocalStorage(panier) {
     console.log("Fonction maj du LS");
     let panierJson = JSON.stringify(panier);
@@ -90,11 +91,14 @@ function majLocalStorage(panier) {
     console.log("Panier mis à jour");
 }
 
+//recupere les infos dans le locaStorage
 function lireLocalStorage() {
     console.log("Fonction lire LS");
     return JSON.parse(localStorage.getItem("panierKanap"));
 }
 
+//Verifie l'etat du localStorage
+//et agit en creation ou modification selon son etat.
 function valideArticle(produit) {
     console.log("Fonction valide article");
     let panier = lireLocalStorage();
@@ -138,19 +142,19 @@ function razQuantite() {
 function lireQuantite(produit) {
     console.log("Fontion lire quantité");
     let cibleQuantite = document.querySelector("#quantity");
-    //Transforme en nombre
     let quantite = cibleQuantite.value;
     //Verifie la validité
     if (quantite == NaN | quantite == "" | quantite < 1 | quantite > 100){
+        //Si non valide, remet à 0 et retourne sur l'attnte d'une entrée valide
         console.log("Probleme de quantité = " + quantite);
         quantite = 0;
         produit.quantite = 0;
         cibleQuantite.value = 0;
-    //Si valide l'affecte au produit
+    //Si valide l'affecte au produit en type number
     } else {
         produit.quantite = parseInt(quantite);
     };
-    //Et la retourne en number
+    //Et la retourne
     return quantite;
 }
 

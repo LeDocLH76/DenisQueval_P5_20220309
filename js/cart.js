@@ -89,12 +89,24 @@ function resteDuScript(contenuMagasin) {
 
 //Debut du traitement du formulaire**************************
     let tableVerification = [
-        {label:"firstName",labelMessage:"firstNameErrorMsg",regExp:"Denis",message:"Message erreur prénom",valide:false},
-        {label:"lastName",labelMessage:"lastNameErrorMsg",regExp:"QUEVAL",message:"Message erreur nom",valide:false},
-        {label:"address",labelMessage:"addressErrorMsg",regExp:"128",message:"Message erreur adresse",valide:false},
-        {label:"city",labelMessage:"cityErrorMsg",regExp:"LH",message:"Message erreur ville",valide:false},
-        {label:"email",labelMessage:"emailErrorMsg",regExp:"moi@labas",message:"Message erreur email",valide:false}        
+        {label:"firstName",labelMessage:"firstNameErrorMsg",regExp:"^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$",message:"Alan => Majuscules minuscules accents espaces tirets 30c maximum",valide:false},
+        {label:"lastName",labelMessage:"lastNameErrorMsg",regExp:"^[A-Z][A-Z' -]{1,28}[A-Z]$",message:"TURING => Majuscules espaces tirets apostrophes 30c maximum",valide:false},
+        {label:"address",labelMessage:"addressErrorMsg",regExp:"^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\u005C-]{1,28}[\\wàâãäçèéêëîïñôöûü]$",message:"Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum",valide:false},
+        {label:"city",labelMessage:"cityErrorMsg",regExp:"^[A-Z][\\wàâãäçèéêëîïñôöûü' /-]{1,28}[\\wàâãäçèéêëîïñôöûü]$",message:"LONDRE => Majuscules minuscules chiffres accents espaces tirets apostrophe 30c maximum",valide:false},
+        {label:"email",labelMessage:"emailErrorMsg",regExp:"^[\\w.+-]{1,64}@[\\w-]{2,252}\\.[a-zA-Z][a-zA-Z\\.]{1,5}$",message:"Veuillez entrer une adresse valide",valide:false}        
     ];
+// ******************Mes regex***********************
+// ^[A-Z][a-zàâãäçèéêëîïñôöûü' -]{1,28}[a-zàâãäçèéêëîïñôöûü]$
+// ^[A-Z][A-Z' -]{1,28}[A-Z]$
+// ^[\\w][\\wàâãäçèéêëîïñôöûü' °/\\-]{1,28}[\\w]$
+// ^[A-Z][\\w' /-]{1,28}[\\w]$
+
+// *******************Celles des autres*****************************
+    // ^[a-z]+([ \-']?[a-z]+[ \-']?[a-z]+[ \-']?)[a-z]+$"
+    // /(^[A-Za-z\u00C0-\u024F-]+? *[A-Za-z\u00C0-\u024F]) ([A-Za-z\u00C0-\u024F-\s]+?$)
+    // ^[^@\s]+@[^@\s]+\.[^@\s]+$
+    // ^[\w.+-]{1,64}@([a-zA-Z\d-]{2,252}\.[a-zA-Z\.]{2,6}){5,255}$
+    // ^((?:(?:[a-zA-Z0-9_\-\.]+)@(?:(?:\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(?:(?:[a-zA-Z0-9\-]+\.)+))(?:[a-zA-Z]{2,4}|[0-9]{1,3})(?:\]?)(?:\s*;\s*|\s*$))*)$
    
     tableVerification.forEach(element => {
         let cible = document.getElementById(element.label);
@@ -102,11 +114,13 @@ function resteDuScript(contenuMagasin) {
         let messageCible = document.getElementById(element.labelMessage)
         // console.log(messageCible);
         cible.addEventListener("change", function () {
-            if (cible.value == element.regExp){
-                console.log("Coucou, j'ai changé de prénom!");
+            const regExVal = new RegExp(element.regExp);
+            console.log(regExVal);
+            if (cible.value.match(regExVal)){
+                console.log(`Coucou, j'ai changé de ${element.label} !`);
                 element.valide = true;
             }else{
-                console.log("entrée non autorisée!");
+                console.log("Entrée non autorisée!");
                 cible.value = "";
                 messageCible.innerHTML = element.message;
                 element.valide = false;
