@@ -96,7 +96,7 @@ function resteDuScript(contenuMagasin) {
 
     // Debut du traitement du formulaire**************************
 
-    // Creation d'un objet contact dans le localStorage
+    // Creation d'un objet contact vide
     let contact = {
         firstName: "",
         lastName: "",
@@ -105,22 +105,36 @@ function resteDuScript(contenuMagasin) {
         email: ""
     }
 
+    // Si localStorage contact n'existe pas, il est créé avec des valeurs vides.
+    if (localStorage.getItem("contact") == null){
+        localStorage.setItem("contact",JSON.stringify(contact));
+    }
+    // Si il existe ou pas, lecture des valeurs enregistrées.
     let contactStorage = JSON.parse(localStorage.getItem("contact"));
+    // Pour tout les input
+    // Si une valeur valide est presente dans le localStorage
+    // Rempli l'objet contact avec les valeurs presentes
     if (contactStorage.firstName != "") {
+        console.log("Un prénom existe");
         contact.firstName = contactStorage.firstName
     };
     if (contactStorage.lastName != "") {
-        contact.lastName = contactStorage.firstName
+        console.log("Un nom existe");
+        contact.lastName = contactStorage.lastName
     };
     if (contactStorage.address != "") {
-        contact.address = contactStorage.firstName
+        console.log("Une adresse existe");
+        contact.address = contactStorage.address
     };
     if (contactStorage.city != "") {
-        contact.city = contactStorage.firstName
+        console.log("Une ville existe");
+        contact.city = contactStorage.city
     };
     if (contactStorage.email != "") {
-        contact.email = contactStorage.firstName
+        console.log("Un email existe");
+        contact.email = contactStorage.email
     };
+    // Met à jours avec les infos connues
     majContactStorage(contact);
 
 
@@ -147,9 +161,12 @@ function resteDuScript(contenuMagasin) {
 
     // Verification de la conformité des entrées input
     // Pour chaque objet de la table de verification
+    // Prerempli le formulaire avecles données valide déja connues
     tableVerification.forEach(element => {
         let cible = document.getElementById(element.label);
         let messageCible = document.getElementById(element.labelMessage);
+        // Prerempli l'input en cours par la derniere donnée valide connue
+        cible.value = contact[element.label];
         // Place un ecouteur sur changement
         cible.addEventListener("change", function () {
             // Nouvel objet RegExp suivant la valeur dans la table de verification
@@ -160,9 +177,9 @@ function resteDuScript(contenuMagasin) {
                 console.log("Entrée valide");
                 // Bascule le drapeau dans la table de verification à vrai
                 element.valide = true;
-                
+                // Met à jour contact et contactStorage avec la nouvelle donnée valide              
                 contact[element.label] = cible.value;
-                majContactStorage(contact);
+                majContactStorage(contact);               
             } else {
                 console.log("Entrée non autorisée!");
                 // Efface l'entrée erronée 
