@@ -166,7 +166,11 @@ function resteDuScript(contenuMagasin) {
         let cible = document.getElementById(element.label);
         let messageCible = document.getElementById(element.labelMessage);
         // Prerempli l'input en cours par la derniere donnée valide connue
+        // Et bascule le drapeau valide dans la table de verification à vrai
         cible.value = contact[element.label];
+        if (cible.value != ""){
+            element.valide = true
+        }
         // Place un ecouteur sur changement
         cible.addEventListener("change", function () {
             // Nouvel objet RegExp suivant la valeur dans la table de verification
@@ -175,7 +179,7 @@ function resteDuScript(contenuMagasin) {
             // Input valide ?
             if (cible.value.match(regExVal)) {
                 console.log("Entrée valide");
-                // Bascule le drapeau dans la table de verification à vrai
+                // Bascule le drapeau valide dans la table de verification à vrai
                 element.valide = true;
                 // Met à jour contact et contactStorage avec la nouvelle donnée valide              
                 contact[element.label] = cible.value;
@@ -186,12 +190,13 @@ function resteDuScript(contenuMagasin) {
                 cible.value = "";
                 // Informe l'utilisateur
                 messageCible.innerHTML = element.message;
-                // Bascule le drapeau dans la table de verification à faux
+                // Bascule le drapeau valide dans la table de verification à faux
                 element.valide = false;
                 console.log(`Erreur de ${element.label} !`);
             }
 
         });
+        // efface les message d'erreur quand l'utilisateur clique dans l'input
         cible.addEventListener("click", function () {
             messageCible.innerHTML = "";
         });
@@ -216,6 +221,7 @@ function resteDuScript(contenuMagasin) {
             // Si tout les input sont valides
             if (flagCommander == true) {
                 alert("Passer la commande");
+                location.replace("confirmation.html");
             } else {
                 // Un au moins des input est invalide
                 alert("Le formulaire n'est pas bien rempli!");
@@ -231,6 +237,7 @@ function resteDuScript(contenuMagasin) {
 }
 
 //Definitions de fonctions***************************************
+
 
 // Met à jour les infos de contact dans le localStorage
 function majContactStorage(contact) {
@@ -335,7 +342,7 @@ function constructionElementDOM(element, article) {
     return contenuUnElement
 }
 
-// Lecture du localStorage
+// Lecture du panier sur le localStorage
 function lireLocalStorage() {
     return JSON.parse(localStorage.getItem("panierKanap"));
 }

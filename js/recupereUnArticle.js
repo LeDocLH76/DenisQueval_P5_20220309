@@ -151,7 +151,7 @@ function lireQuantite(produit) {
     let quantite = cibleQuantite.value;
     //Verifie la validité
     if (quantite == NaN | quantite == "" | quantite < 1 | quantite > 100){
-        //Si non valide, remet à 0 et retourne sur l'attnte d'une entrée valide
+        //Si non valide, remet à 0 et retourne sur l'attente d'une entrée valide
         console.log("Probleme de quantité = " + quantite);
         quantite = 0;
         produit.quantite = 0;
