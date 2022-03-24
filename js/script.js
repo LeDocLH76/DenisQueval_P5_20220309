@@ -22,18 +22,19 @@ fetch(listeProduits)
 // Parcours la liste des produits disponibles
 // et aglomere les differentes cartes article
 function aglomerationElementsDOM(produits) {
+    console.log("Fonction aglomeration des éléments du Dom");
     let blocElementsDom = "";
     for (let index = 0; index < produits.length; index++) {
         const element = produits[index];
         // appel de la fonction de construction d'une carte
         blocElementsDom += constructionElementDOM(element);
     }
-    console.log(blocElementsDom)
     return blocElementsDom
 }
 
 // Prepare les elements du DOM pour une carte article
 function constructionElementDOM(produit) {
+    console.log("Fontion construction d'un élément du Dom");
     let element = `
     <a href="./product.html?id=${produit._id}">\n
     <article>\n

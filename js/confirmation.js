@@ -6,7 +6,7 @@ console.log(typeof panier + panier);
 // Si panier n'existe pas ou vide => info utilisateur et retour à l'acceuil.
 // Si ok créer un tableau d'Id des articles presents dans le panier.
 if (panier == null | panier == "") {
-    alert("Le panier est vide. Retour à l'acceuil");
+    alert("Le panier n'existe pas.\nRetour à l'acceuil");
     location.replace("index.html");
 };
  
@@ -77,8 +77,12 @@ function commander(content) {
             console.log(value.orderId);
             cible = document.getElementById("orderId");
             cible.innerHTML = value.orderId;
-            alert("Votre commande est enregistrée.\nCe numéro ne sera plus affiché.\nUn email vous à été envoyé à " + value.contact.email + " pour confirmer.");
-            location.replace("index.html");
+            alert(`
+Votre commande est enregistrée.
+Ce numéro ne sera plus affiché.
+Un email de confirmation à été envoyé à ${value.contact.email}`);
+            localStorage.removeItem("panierKanap");
+
         })
         .catch(function (err) {
             console.log("Probleme " + err);

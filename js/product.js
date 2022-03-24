@@ -40,11 +40,13 @@ function resteDuScript(value) {
         //Lire et filtrer la quantité
         quantite = lireQuantite(produit);
         if (produit.couleur == "" | quantite == 0) {
-            alert("Veuillez indiquer une couleur et une quantité.");
+            alert("Veuillez indiquer une couleur et une quantité valide.");
         } else {
             valideArticle(produit);
+            console.log("Quantite d'article dans le panier = " + lireLocalStorage().length);
+            
             console.log("Le produit à été ajouté au panier");
-            if(confirm("Voulez vous aller au panier ?")){
+            if(confirm(`Il y à maintenant ${lireLocalStorage().length} ${lireLocalStorage().length < 2 ? "référence" : "références"} dans le panier.\nVoulez vous aller au panier ?`)){
                 document.location.replace("cart.html");
             }else{
                 console.log("Je reste ici !")
@@ -57,7 +59,10 @@ function resteDuScript(value) {
     console.log("Attente CTA");
 }
 
+// ************* Definitions de fonctions*****************************************
+
 //Compare le produit à ajouter avec ceux contenus dans le loalStorage
+// Selon le cas, ajoute le produit, ou modifie la quantité de celui existant
 function compareIdLocalStorage(produit) {
     console.log("Fonction compare");
     let contenuLocalStorage = lireLocalStorage();
@@ -89,12 +94,11 @@ function compareIdLocalStorage(produit) {
     majLocalStorage(contenuLocalStorage);
 }
 
-//Remet à jour le localStore avec les infos contenues dans panier
+//Remet à jour le localStorage avec les infos contenues dans panier
 function majLocalStorage(panier) {
     console.log("Fonction maj du LS");
     let panierJson = JSON.stringify(panier);
     localStorage.setItem("panierKanap", panierJson);
-    console.log("Panier mis à jour");
 }
 
 //recupere les infos dans le locaStorage
@@ -115,7 +119,7 @@ function valideArticle(produit) {
         console.log("Panier créé!");
     //Si le panier contient quelque chose
     } else {
-        console.log("Le panier contient déja qqc");
+        console.log("Le panier existe déja");
         //On compare et on met à jour le panier suivant ce qu'il contient déja
         compareIdLocalStorage(produit);
     }
@@ -128,7 +132,7 @@ function lireCouleur(produit, value) {
     let cibleCouleur = document.querySelector("#colors");
     //Pas de couleur selectionnée
     if (cibleCouleur.selectedIndex == 0) {
-        console.log("Veuillez choisir une couleur!");
+        console.log("Mauvaise couleur");
         produit.couleur = "";
     //Affecte la couleur à l'index -1 dans le tableau de couleur recuperé sur le serveur à produit.couleur
     } else {
@@ -152,7 +156,7 @@ function lireQuantite(produit) {
     //Verifie la validité
     if (quantite == NaN | quantite == "" | quantite < 1 | quantite > 100){
         //Si non valide, remet à 0 et retourne sur l'attente d'une entrée valide
-        console.log("Probleme de quantité = " + quantite);
+        console.log("Mauvaise quantité");
         quantite = 0;
         produit.quantite = 0;
         cibleQuantite.value = 0;
