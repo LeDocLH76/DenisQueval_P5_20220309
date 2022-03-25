@@ -45,3 +45,17 @@ function constructionElementDOM(produit) {
     </a>\n`;
     return element;
 }
+
+let objet = {
+    cle0:"valeur0",
+    cle1:"valeur1",
+    cle2:"valeur2",
+    cle3:"valeur3",
+};
+let tableau = [
+    "valeur0",
+    "valeur1",
+    "valeur2"
+];
+body = JSON.stringify({"MonObjet":objet,"MonTableau":tableau});
+console.log(body);
